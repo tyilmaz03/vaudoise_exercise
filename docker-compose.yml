@@ -1,0 +1,73 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres_vaudoise
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: vaudoise_app_dev
+    restart: unless-stopped
+    working_dir: /workspace
+    env_file: ./.env
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS}
+      MAVEN_OPTS: ${MAVEN_OPTS}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./:/workspace
+      - mvn-repo:/root/.m2
+    command: >
+      bash -lc "
+        chmod +x mvnw || true &&
+        rm -rf target &&
+        ./mvnw -U -B clean verify &&
+        ./mvnw -q spring-boot:run
+      "
+
+  app-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vaudoise_app:latest
+    container_name: vaudoise_app_prod
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8081:8080"
+
+
+volumes:
+  pgdata:
+  mvn-repo:
