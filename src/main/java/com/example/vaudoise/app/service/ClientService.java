@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.UUID;
 import java.util.NoSuchElementException;
 import com.example.vaudoise.web.dto.ClientUpdateRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ClientService {
@@ -161,6 +162,19 @@ public class ClientService {
 
         Client updated = repository.save(client);
         return mapper.toResponse(updated);
+    }
+
+    @Transactional
+    public String deleteClient(UUID id) {
+        Client client = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Client not found with id: " + id));
+
+        // contractRepository.findByClientId(id)
+        //         .forEach(contract -> contract.setEndDate(LocalDate.now()));
+
+        repository.delete(client);
+
+        return "Client deleted successfully";
     }
 
 

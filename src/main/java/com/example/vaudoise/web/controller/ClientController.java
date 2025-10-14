@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 import com.example.vaudoise.web.dto.ClientUpdateRequest;
+import java.util.Map;
 
 
 @RestController
@@ -57,6 +58,11 @@ public class ClientController {
         return ResponseEntity.ok(updated);
     }
 
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteClient(@PathVariable UUID id) {
+        String message = clientService.deleteClient(id);
+        Map<String, String> response = Map.of("message", message);
+        return ResponseEntity.ok(response);
+    }
 
 }
