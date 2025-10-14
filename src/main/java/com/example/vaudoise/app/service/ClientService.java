@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.UUID;
 import java.util.NoSuchElementException;
+import com.example.vaudoise.web.dto.ClientUpdateRequest;
 
 @Service
 public class ClientService {
@@ -121,5 +122,47 @@ public class ClientService {
 
         throw new BadRequestException(List.of("Invalid search request"));
     }
+
+
+    public ClientResponse updateClient(UUID id, ClientUpdateRequest req) {
+        Client client = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Client not found with id: " + id));
+
+        List<String> errors = new ArrayList<>();
+
+        // Vérifications de non-modifiabilité
+        if (req == null) {
+            throw new BadRequestException(List.of("Update request cannot be null"));
+        }
+
+        // Email déjà utilisé par un autre client
+        if (req.getEmail() != null && repository.existsByEmail(req.getEmail()) &&
+            !req.getEmail().equals(client.getEmail())) {
+            errors.add("Email already in use");
+        }
+
+        // Téléphone déjà utilisé par un autre client
+        if (req.getPhone() != null && repository.existsByPhone(req.getPhone()) &&
+            !req.getPhone().equals(client.getPhone())) {
+            errors.add("Phone number already in use");
+        }
+
+        if (!errors.isEmpty()) {
+            throw new BadRequestException(errors);
+        }
+
+        // Mise à jour des champs autorisés
+        String name = (req.getName() != null && !req.getName().isBlank()) ? req.getName() : client.getName();
+        String email = (req.getEmail() != null && !req.getEmail().isBlank()) ? req.getEmail() : client.getEmail();
+        String phone = (req.getPhone() != null && !req.getPhone().isBlank()) ? req.getPhone() : client.getPhone();
+
+
+        client.updateContactInfo(name, email, phone);
+
+        Client updated = repository.save(client);
+        return mapper.toResponse(updated);
+    }
+
+
 
 }

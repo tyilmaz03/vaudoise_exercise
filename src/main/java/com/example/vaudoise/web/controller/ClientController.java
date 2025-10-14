@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
+import com.example.vaudoise.web.dto.ClientUpdateRequest;
 
 
 @RestController
@@ -46,6 +47,16 @@ public class ClientController {
         ClientResponse client = clientService.getClientBy(email, phone, companyIdentifier);
         return ResponseEntity.ok(client);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ClientResponse> updateClient(
+            @PathVariable UUID id,
+            @Valid @RequestBody ClientUpdateRequest request) {
+
+        ClientResponse updated = clientService.updateClient(id, request);
+        return ResponseEntity.ok(updated);
+    }
+
 
 
 }
