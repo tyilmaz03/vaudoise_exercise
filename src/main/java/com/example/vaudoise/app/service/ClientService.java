@@ -5,6 +5,7 @@ import com.example.vaudoise.core.exception.BadRequestException;
 import com.example.vaudoise.core.exception.ConflictException;
 import com.example.vaudoise.core.model.*;
 import com.example.vaudoise.data.ClientRepository;
+import com.example.vaudoise.data.CompanyRepository;
 import com.example.vaudoise.web.dto.ClientCreateRequest;
 import com.example.vaudoise.web.dto.ClientResponse;
 import org.springframework.stereotype.Service;
@@ -13,15 +14,21 @@ import com.example.vaudoise.core.model.ClientType;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.UUID;
+import java.util.NoSuchElementException;
 
 @Service
 public class ClientService {
 
     private final ClientRepository repository;
+    private final CompanyRepository companyRepository;
+
     private final ClientMapper mapper;
 
-    public ClientService(ClientRepository repository, ClientMapper mapper) {
+    public ClientService(ClientRepository repository,CompanyRepository companyRepository, ClientMapper mapper) {
         this.repository = repository;
+        this.companyRepository = companyRepository;
         this.mapper = mapper;
     }
 
@@ -67,4 +74,52 @@ public class ClientService {
         Client saved = repository.save(client);
         return mapper.toResponse(saved);
     }
+
+
+    public List<ClientResponse> getAllClients() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public ClientResponse getClientById(UUID id) {
+        return repository.findById(id)
+                .map(mapper::toResponse)
+                .orElseThrow(() -> new NoSuchElementException("Client not found with id: " + id));
+    }
+
+
+    public ClientResponse getClientBy(String email, String phone, String companyIdentifier) {
+
+        if ((email == null || email.isBlank())
+                && (phone == null || phone.isBlank())
+                && (companyIdentifier == null || companyIdentifier.isBlank())) {
+            throw new BadRequestException(List.of("At least one search parameter is required"));
+        }
+
+    // Recherche par email
+        if (email != null && !email.isBlank()) {
+            return repository.findByEmail(email)
+                    .map(mapper::toResponse)
+                    .orElseThrow(() -> new NoSuchElementException("Client not found with email: " + email));
+        }
+
+    // Recherche par téléphone
+        if (phone != null && !phone.isBlank()) {
+            return repository.findByPhone(phone)
+                    .map(mapper::toResponse)
+                    .orElseThrow(() -> new NoSuchElementException("Client not found with phone: " + phone));
+        }
+
+    // Recherche par identifiant d’entreprise
+        if (companyIdentifier != null && !companyIdentifier.isBlank()) {
+            return companyRepository.findByCompanyIdentifier(companyIdentifier)
+                .map(mapper::toResponse)
+                .orElseThrow(() -> new NoSuchElementException("Client not found with companyIdentifier: " + companyIdentifier));
+        }
+
+        throw new BadRequestException(List.of("Invalid search request"));
+    }
+
 }

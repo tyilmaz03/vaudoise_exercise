@@ -11,6 +11,7 @@ import jakarta.validation.ConstraintViolationException;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -63,6 +64,12 @@ public class ApiExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneric(Exception ex) {
         return buildErrorResponse(List.of("Internal server error"), HttpStatus.INTERNAL_SERVER_ERROR, "Server error");
+    }
+
+    //  404 - Ressource non trouvée
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<?> handleNotFound(NoSuchElementException ex) {
+        return buildErrorResponse(List.of(ex.getMessage()), HttpStatus.NOT_FOUND, "Not Found");
     }
 
     private ResponseEntity<Map<String, Object>> buildErrorResponse(List<String> messages, HttpStatus status, String errorType) {
