@@ -1,0 +1,49 @@
+package com.example.vaudoise.core.model;
+
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
+
+@Getter
+@Setter(AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "contracts")
+public class Contract {
+
+    @Id
+    @GeneratedValue
+    @Column(nullable = false, updatable = false)
+    private UUID id;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
+
+    @Column(nullable = false)
+    private BigDecimal amount;
+
+    @Column(nullable = false)
+    private LocalDate startDate;
+
+    @Column
+    private LocalDate endDate;
+
+    @Column(nullable = false)
+    private LocalDate updateDate;
+
+    public Contract(Client client, BigDecimal amount, LocalDate startDate, LocalDate endDate) {
+        this.client = client;
+        this.amount = amount;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.updateDate = LocalDate.now();
+    }
+
+}
