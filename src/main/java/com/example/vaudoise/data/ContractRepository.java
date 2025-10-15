@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.List;
 import java.time.LocalDate;
 import java.math.BigDecimal;
+import org.springframework.data.domain.Sort;
+
 
 
 public interface ContractRepository extends JpaRepository<Contract, UUID> {
@@ -18,17 +20,11 @@ public interface ContractRepository extends JpaRepository<Contract, UUID> {
     @Query("""
         SELECT c FROM Contract c
         WHERE c.client.id = :clientId
-        AND (c.endDate IS NULL OR c.endDate > :currentDate)
-        ORDER BY c.updateDate DESC
+        AND (c.endDate IS NULL OR c.endDate > CURRENT_DATE)
     """)
-    List<Contract> findActiveContractsByClientId(@Param("clientId") UUID clientId, @Param("currentDate") LocalDate currentDate);
+    List<Contract> findActiveContractsByClientId(UUID clientId, Sort sort);
     
-    @Query("""
-        SELECT c FROM Contract c
-        WHERE c.client.id = :clientId
-        ORDER BY c.updateDate DESC
-    """)
-    List<Contract> findAllByClientIdOrderByUpdateDateDesc(@Param("clientId") UUID clientId);
+    List<Contract> findAllByClientId(UUID clientId, Sort sort);
 
     @Query("""
         SELECT COALESCE(SUM(c.amount), 0)

@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.UUID;
 import com.example.vaudoise.web.dto.ContractUpdateRequest;
+import org.springframework.data.domain.Sort;
+
 
 @Service
 public class ContractService {
@@ -74,14 +76,13 @@ public class ContractService {
     }
 
 
-    public List<ContractResponse> getActiveContractsByClient(UUID clientId) {
-        
-        ensureClientExists(clientId);
+    public List<ContractResponse> getActiveContractsByClient(UUID clientId, boolean sortByUpdateDateDesc) {
+        Sort sort = sortByUpdateDateDesc ? Sort.by(Sort.Direction.DESC, "updateDate") : Sort.unsorted();
 
-        List<Contract> contracts = contractRepository.findActiveContractsByClientId(clientId, LocalDate.now());
-        
+        List<Contract> contracts = contractRepository.findActiveContractsByClientId(clientId, sort);
+
         if (contracts.isEmpty()) {
-            throw new NoSuchElementException("No active contract found for client with id: " + clientId);
+            throw new BadRequestException(List.of("No active contract found for this client"));
         }
 
         return contracts.stream()
@@ -89,13 +90,13 @@ public class ContractService {
                 .toList();
     }
 
-    public List<ContractResponse> getAllContractsByClient(UUID clientId) {
+    public List<ContractResponse> getContractsByClient(UUID clientId, boolean sortByUpdateDateDesc) {
+        Sort sort = sortByUpdateDateDesc ? Sort.by(Sort.Direction.DESC, "updateDate") : Sort.unsorted();
 
-        ensureClientExists(clientId);
-        List<Contract> contracts = contractRepository.findAllByClientIdOrderByUpdateDateDesc(clientId);
-        
+        List<Contract> contracts = contractRepository.findAllByClientId(clientId, sort);
+
         if (contracts.isEmpty()) {
-            throw new NoSuchElementException("No contract found for client with id: " + clientId);
+            throw new BadRequestException(List.of("No contract found for this client"));
         }
 
         return contracts.stream()

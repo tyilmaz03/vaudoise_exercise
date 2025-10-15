@@ -30,13 +30,19 @@ public class ContractController {
     }
 
     @GetMapping("/client/{clientId}/active")
-    public List<ContractResponse> getActiveContractsByClient(@PathVariable UUID clientId) {
-        return contractService.getActiveContractsByClient(clientId);
+    public ResponseEntity<List<ContractResponse>> getActiveContractsByClient(
+            @PathVariable UUID clientId,
+            @RequestParam(defaultValue = "false") boolean sortByUpdateDateDesc
+    ) {
+        return ResponseEntity.ok(contractService.getActiveContractsByClient(clientId, sortByUpdateDateDesc));
     }
 
     @GetMapping("/client/{clientId}")
-    public List<ContractResponse> getAllContractsByClient(@PathVariable UUID clientId) {
-        return contractService.getAllContractsByClient(clientId);
+    public ResponseEntity<List<ContractResponse>> getContractsByClient(
+            @PathVariable UUID clientId,
+            @RequestParam(defaultValue = "false") boolean sortByUpdateDateDesc
+    ) {
+        return ResponseEntity.ok(contractService.getContractsByClient(clientId, sortByUpdateDateDesc));
     }
 
     @GetMapping("/client/{clientId}/active/total")
