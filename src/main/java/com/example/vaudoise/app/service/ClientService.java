@@ -6,6 +6,7 @@ import com.example.vaudoise.core.exception.ConflictException;
 import com.example.vaudoise.core.model.*;
 import com.example.vaudoise.data.ClientRepository;
 import com.example.vaudoise.data.CompanyRepository;
+import com.example.vaudoise.data.ContractRepository;
 import com.example.vaudoise.web.dto.ClientCreateRequest;
 import com.example.vaudoise.web.dto.ClientResponse;
 import org.springframework.stereotype.Service;
@@ -25,12 +26,15 @@ public class ClientService {
 
     private final ClientRepository repository;
     private final CompanyRepository companyRepository;
+    private final ContractRepository contractRepository;
+
 
     private final ClientMapper mapper;
 
-    public ClientService(ClientRepository repository,CompanyRepository companyRepository, ClientMapper mapper) {
+    public ClientService(ClientRepository repository,CompanyRepository companyRepository, ContractRepository contractRepository, ClientMapper mapper) {
         this.repository = repository;
         this.companyRepository = companyRepository;
+        this.contractRepository = contractRepository;
         this.mapper = mapper;
     }
 
@@ -169,8 +173,33 @@ public class ClientService {
         Client client = repository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Client not found with id: " + id));
 
-        // contractRepository.findByClientId(id)
-        //         .forEach(contract -> contract.setEndDate(LocalDate.now()));
+
+        List<Contract> futureContracts =
+            contractRepository.findByClientIdAndStartDateAfter(id, LocalDate.now());
+        
+        if (!futureContracts.isEmpty()) {
+            List<String> details = futureContracts.stream()
+                    .map(c -> "contractId=" + c.getId() + ", startDate=" + c.getStartDate())
+                    .toList();
+
+            List<String> errors = new ArrayList<>();
+            errors.add("Client has contract starting in the future. " +
+                    "Delete them first or set startDate to today or a past date.");
+            errors.addAll(details);
+
+            throw new BadRequestException(errors);
+        }
+
+        List<Contract> activeContracts = contractRepository.findByClientId(id)
+                .stream()
+                .filter(c -> c.getEndDate() == null || c.getEndDate().isAfter(LocalDate.now()))
+                .toList();
+
+        for (Contract contract : activeContracts) {
+            contract.close(LocalDate.now());
+        }
+
+        contractRepository.saveAll(activeContracts);
 
         repository.delete(client);
 

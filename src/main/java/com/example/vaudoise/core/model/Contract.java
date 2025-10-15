@@ -22,8 +22,8 @@ public class Contract {
     @Column(nullable = false, updatable = false)
     private UUID id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "client_id", nullable = false)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "client_id", nullable = false, updatable = false)
     private Client client;
 
     @Column(nullable = false)
@@ -42,6 +42,11 @@ public class Contract {
         this.client = client;
         this.amount = amount;
         this.startDate = startDate;
+        this.endDate = endDate;
+        this.updateDate = LocalDate.now();
+    }
+
+    public void close(LocalDate endDate) {
         this.endDate = endDate;
         this.updateDate = LocalDate.now();
     }
