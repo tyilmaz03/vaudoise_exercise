@@ -34,15 +34,17 @@ Vaudoise est une application **Spring Boot** permettant de gérer des **clients*
 
 ##  Structure du projet
 
+```md
+```plaintext
 ├── src/
-│ ├── main/java/com/example/vaudoise/
-│ │ ├── app/ # Services, logique métier
-│ │ ├── core/ # Entités JPA et exceptions
-│ │ ├── data/ # Repositories Spring Data JPA
-│ │ ├── web/ # Controllers et DTO
-│ └── resources/
-│ ├── application.yml
-│ └── ...
+│   ├── main/java/com/example/vaudoise/
+│   │   ├── app/           # Services, logique métier
+│   │   ├── core/          # Entités JPA et exceptions
+│   │   ├── data/          # Repositories Spring Data JPA
+│   │   ├── web/           # Controllers et DTO
+│   └── resources/
+│       ├── application.yml
+│       └── ...
 ├── Dockerfile
 ├── docker-compose.yml
 └── README.md
@@ -55,7 +57,7 @@ Vaudoise est une application **Spring Boot** permettant de gérer des **clients*
 
 ### 2. Lancer l’application et la base PostgreSQL
 
-`docker compose up app-prod`
+`docker compose up app-prod -d`
 
 ### 3. Vérifier que tout fonctionne
 
@@ -76,11 +78,6 @@ L’API a été **testée et vérifiée** à travers plusieurs moyens :
 
 - **Swagger UI** (`/swagger-ui.html`) :  
   Tous les endpoints peuvent être exécutés directement pour vérifier leur comportement en temps réel.
-
-- **Tests d’intégration** (voir `/src/test/java/com/example/vaudoise`) confirmant :
-  - La création et la validation des clients  
-  - La création, modification et clôture automatique des contrats  
-  - La cohérence des relations entre les entités *Client* et *Contract*
 
 - **Tests manuels réalisés via Swagger** :
   1. Création d’un client de type `PERSON` via `POST /clients`  
