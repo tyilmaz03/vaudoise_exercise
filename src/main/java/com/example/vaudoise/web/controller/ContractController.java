@@ -24,4 +24,15 @@ public class ContractController {
         ContractResponse created = contractService.createContract(request);
         return ResponseEntity.status(201).body(created);
     }
+
+    @GetMapping("/client/{clientId}/active")
+    public List<ContractResponse> getActiveContractsByClient(@PathVariable UUID clientId) {
+        return contractService.getActiveContractsByClient(clientId);
+    }
+
+    @GetMapping("/client/{clientId}")
+    public List<ContractResponse> getAllContractsByClient(@PathVariable UUID clientId) {
+        return contractService.getAllContractsByClient(clientId);
+    }
+    
 }

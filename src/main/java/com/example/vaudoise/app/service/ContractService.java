@@ -65,4 +65,20 @@ public class ContractService {
         return mapper.toResponse(saved);
     }
 
+
+    public List<ContractResponse> getActiveContractsByClient(UUID clientId) {
+        List<Contract> contracts = contractRepository.findActiveContractsByClientId(clientId, LocalDate.now());
+        return contracts.stream()
+                .map(mapper::toResponse)
+                .toList();
+    }
+
+    public List<ContractResponse> getAllContractsByClient(UUID clientId) {
+        List<Contract> contracts = contractRepository.findAllByClientIdOrderByUpdateDateDesc(clientId);
+        return contracts.stream()
+                .map(mapper::toResponse)
+                .toList();
+    }
+
+
 }
