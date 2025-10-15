@@ -10,6 +10,7 @@ import com.example.vaudoise.web.dto.ContractCreateRequest;
 import com.example.vaudoise.web.dto.ContractResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.NoSuchElementException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -65,23 +66,51 @@ public class ContractService {
         return mapper.toResponse(saved);
     }
 
+    private void ensureClientExists(UUID clientId) {
+        if (!clientRepository.existsById(clientId)) {
+            throw new NoSuchElementException("Client not found with id: " + clientId);
+        }
+    }
+
 
     public List<ContractResponse> getActiveContractsByClient(UUID clientId) {
+        
+        ensureClientExists(clientId);
+
         List<Contract> contracts = contractRepository.findActiveContractsByClientId(clientId, LocalDate.now());
+        
+        if (contracts.isEmpty()) {
+            throw new NoSuchElementException("No active contract found for client with id: " + clientId);
+        }
+
         return contracts.stream()
                 .map(mapper::toResponse)
                 .toList();
     }
 
     public List<ContractResponse> getAllContractsByClient(UUID clientId) {
+
+        ensureClientExists(clientId);
         List<Contract> contracts = contractRepository.findAllByClientIdOrderByUpdateDateDesc(clientId);
+        
+        if (contracts.isEmpty()) {
+            throw new NoSuchElementException("No contract found for client with id: " + clientId);
+        }
+
         return contracts.stream()
                 .map(mapper::toResponse)
                 .toList();
     }
 
     public BigDecimal getActiveContractsTotal(UUID clientId) {
-        return contractRepository.sumActiveContractsAmount(clientId, LocalDate.now());
+        ensureClientExists(clientId);
+        
+        BigDecimal total = contractRepository.sumActiveContractsAmount(clientId, LocalDate.now());
+        if (total.compareTo(BigDecimal.ZERO) == 0) {
+            throw new NoSuchElementException("No active contract found for client with id: " + clientId);
+        }
+
+        return total;
     }
 
 }
