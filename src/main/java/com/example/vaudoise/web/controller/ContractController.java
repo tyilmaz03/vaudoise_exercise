@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/contracts")
@@ -33,6 +36,17 @@ public class ContractController {
     @GetMapping("/client/{clientId}")
     public List<ContractResponse> getAllContractsByClient(@PathVariable UUID clientId) {
         return contractService.getAllContractsByClient(clientId);
+    }
+
+    @GetMapping("/client/{clientId}/active/total")
+    public ResponseEntity<Map<String, Object>> getActiveContractsTotal(@PathVariable UUID clientId) {
+        BigDecimal total = contractService.getActiveContractsTotal(clientId);
+        Map<String, Object> response = Map.of(
+                "clientId", clientId,
+                "totalActiveAmount", total,
+                "currency", "CHF"
+        );
+        return ResponseEntity.ok(response);
     }
     
 }

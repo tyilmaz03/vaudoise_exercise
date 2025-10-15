@@ -80,5 +80,8 @@ public class ContractService {
                 .toList();
     }
 
+    public BigDecimal getActiveContractsTotal(UUID clientId) {
+        return contractRepository.sumActiveContractsAmount(clientId, LocalDate.now());
+    }
 
 }
