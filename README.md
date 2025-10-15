@@ -7,6 +7,14 @@ Vaudoise est une application **Spring Boot** permettant de gérer des **clients*
 
 ---
 
+## 📚 Table des matières
+- [Fonctionnalités principales](#fonctionnalités-principales)
+- [Prérequis](#prérequis)
+- [Structure du projet](#structure-du-projet)
+- [Exécution avec Docker](#exécution-avec-docker)
+- [Preuve de bon fonctionnement](#preuve-de-bon-fonctionnement-proof-of-functionality)
+- [Architecture et conception](#architecture-et-conception)
+
 ##  Fonctionnalités principales
 
 ### Gestion des clients
@@ -34,8 +42,6 @@ Vaudoise est une application **Spring Boot** permettant de gérer des **clients*
 
 ##  Structure du projet
 
-```md
-```plaintext
 ├── src/
 │   ├── main/java/com/example/vaudoise/
 │   │   ├── app/           # Services, logique métier
@@ -99,4 +105,5 @@ Cette séparation permet une bonne testabilité et une évolution simple des rè
 L’application respecte les principes **RESTful** et utilise **DTOs** pour isoler la couche API des entités internes.  
 La configuration via **Docker Compose** facilite le déploiement local et la portabilité entre environnements.  
 L’usage de **Lombok** réduit le code "boilerplate", et **Swagger** documente automatiquement l’API.
+
 
