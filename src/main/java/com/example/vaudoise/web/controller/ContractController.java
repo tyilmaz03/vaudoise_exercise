@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.UUID;
 import java.math.BigDecimal;
 import java.util.Map;
-
+import jakarta.validation.Valid;
+import com.example.vaudoise.web.dto.ContractUpdateRequest;
 
 @RestController
 @RequestMapping("/contracts")
@@ -47,6 +48,15 @@ public class ContractController {
                 "currency", "CHF"
         );
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ContractResponse> updateContract(
+            @PathVariable UUID id,
+            @Valid @RequestBody ContractUpdateRequest request
+    ) {
+        ContractResponse updated = contractService.updateContract(id, request);
+        return ResponseEntity.ok(updated);
     }
     
 }

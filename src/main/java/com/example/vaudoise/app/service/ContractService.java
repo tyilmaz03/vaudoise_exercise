@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.UUID;
+import com.example.vaudoise.web.dto.ContractUpdateRequest;
 
 @Service
 public class ContractService {
@@ -111,6 +112,54 @@ public class ContractService {
         }
 
         return total;
+    }
+
+
+    @Transactional
+    public ContractResponse updateContract(UUID id, ContractUpdateRequest req) {
+        Contract contract = contractRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Contract not found with id: " + id));
+
+        List<String> errors = new ArrayList<>();
+
+        // Vérification du montant
+        if (req.getAmount() != null && req.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            errors.add("Amount cannot be negative");
+        }
+
+        // Vérification cohérence des dates
+        if (req.getStartDate() != null && req.getEndDate() != null) {
+            if (req.getStartDate().isAfter(req.getEndDate())) {
+                errors.add("Start date cannot be after end date");
+            }
+        }
+
+        // Empêche la réactivation d’un contrat déjà terminé
+        if (contract.getEndDate() != null && contract.getEndDate().isBefore(LocalDate.now())) {
+            errors.add("Cannot modify a contract that has already ended");
+        }
+
+        // Autorise startDate future seulement si le contrat n'est pas terminé
+        if (req.getStartDate() != null && req.getStartDate().isAfter(LocalDate.now())) {
+            if (contract.getEndDate() != null && contract.getEndDate().isBefore(LocalDate.now())) {
+                errors.add("Cannot set a future start date for an ended contract");
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            throw new BadRequestException(errors);
+        }
+
+        // Mise à jour sélective
+        if (req.getAmount() != null) {
+            contract.updateAmount(req.getAmount());
+        }
+        if (req.getStartDate() != null || req.getEndDate() != null) {
+            contract.updateDates(req.getStartDate(), req.getEndDate());
+        }
+
+        Contract updated = contractRepository.save(contract);
+        return mapper.toResponse(updated);
     }
 
 }

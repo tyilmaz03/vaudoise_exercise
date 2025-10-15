@@ -51,4 +51,16 @@ public class Contract {
         this.updateDate = LocalDate.now();
     }
 
+    public void updateAmount(BigDecimal amount) {
+        this.amount = amount;
+        this.updateDate = LocalDate.now();
+    }
+
+    public void updateDates(LocalDate startDate, LocalDate endDate) {
+        if (startDate != null) this.startDate = startDate;
+        if (endDate != null) this.endDate = endDate;
+        this.updateDate = LocalDate.now();
+    }
+
+
 }
