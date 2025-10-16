@@ -56,6 +56,7 @@ Vaudoise est une application **Spring Boot** permettant de gérer des **clients*
 
 ##  Structure du projet
 
+```plaintext
 ├── src/
 │ ├── main/java/com/example/vaudoise/
 │ │ ├── app/ # Services, logique métier
@@ -68,14 +69,14 @@ Vaudoise est une application **Spring Boot** permettant de gérer des **clients*
 ├── Dockerfile
 ├── docker-compose.yml
 └── README.md
+```
 
 ##  Exécution avec Docker
 
 ### 1. Cloner le projet
 
-```bash
-git clone https://github.com/tyilmaz03/vaudoise_exercise.git
-cd vaudoise_exercise
+`git clone https://github.com/tyilmaz03/vaudoise_exercise.git`
+`cd vaudoise_exercise`
 
 ### 2. Lancer l’application et la base PostgreSQL
 
