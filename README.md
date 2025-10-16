@@ -76,6 +76,7 @@ Vaudoise est une application **Spring Boot** permettant de gérer des **clients*
 ### 1. Cloner le projet
 
 `git clone https://github.com/tyilmaz03/vaudoise_exercise.git`
+
 `cd vaudoise_exercise`
 
 ### 2. Lancer l’application et la base PostgreSQL
@@ -98,7 +99,7 @@ Cette commande va :
 
 ### 4. Accéder à l'API pour tester les fonctionnalités
 
-`http://localhost:8081/swagger-ui.html`
+`http://localhost:8080/swagger-ui.html`
 
 ### 5. Arrêter l’application
 
