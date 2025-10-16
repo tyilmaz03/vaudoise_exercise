@@ -9,11 +9,25 @@ Vaudoise est une application **Spring Boot** permettant de gérer des **clients*
 
 ## 📚 Table des matières
 - [Fonctionnalités principales](#fonctionnalités-principales)
+  - [Gestion des clients](#gestion-des-clients)
+  - [Gestion des contrats](#gestion-des-contrats)
 - [Prérequis](#prérequis)
 - [Structure du projet](#structure-du-projet)
 - [Exécution avec Docker](#exécution-avec-docker)
-- [Preuve de bon fonctionnement](#preuve-de-bon-fonctionnement-proof-of-functionality)
+  - [1. Cloner le projet](#1-cloner-le-projet)
+  - [2. Lancer l’application et la base-postgresql](#2-lancer-lapplication-et-la-base-postgresql)
+  - [3. Vérifier que tout fonctionne](#3-vérifier-que-tout-fonctionne)
+  - [4. Accéder-à-lapi-pour-tester-les-fonctionnalités](#4-accéder-à-lapi-pour-tester-les-fonctionnalités)
+  - [5. Arrêter l’application](#5-arrêter-lapplication)
+- [Mise à jour de l’application](#mise-à-jour-de-lapplication)
+- [CI/CD et publication automatique des images](#cicd-et-publication-automatique-des-images)
+  - [Fonctionnement](#fonctionnement)
+  - [Emplacement de l’image](#emplacement-de-limage)
+- [Preuve de bon fonctionnement (Proof of Functionality)](#preuve-de-bon-fonctionnement-proof-of-functionality)
 - [Architecture et conception](#architecture-et-conception)
+
+
+---
 
 ##  Fonctionnalités principales
 
@@ -43,27 +57,39 @@ Vaudoise est une application **Spring Boot** permettant de gérer des **clients*
 ##  Structure du projet
 
 ├── src/
-│   ├── main/java/com/example/vaudoise/
-│   │   ├── app/           # Services, logique métier
-│   │   ├── core/          # Entités JPA et exceptions
-│   │   ├── data/          # Repositories Spring Data JPA
-│   │   ├── web/           # Controllers et DTO
-│   └── resources/
-│       ├── application.yml
-│       └── ...
+│ ├── main/java/com/example/vaudoise/
+│ │ ├── app/ # Services, logique métier
+│ │ ├── core/ # Entités JPA et exceptions
+│ │ ├── data/ # Repositories Spring Data JPA
+│ │ ├── web/ # Controllers et DTO
+│ └── resources/
+│ ├── application.yml
+│ └── ...
 ├── Dockerfile
 ├── docker-compose.yml
 └── README.md
 
 ##  Exécution avec Docker
 
-###  1. Construire l’image
+### 1. Cloner le projet
 
-`docker compose build app-prod`
+```bash
+git clone https://github.com/tyilmaz03/vaudoise_exercise.git
+cd vaudoise_exercise
 
 ### 2. Lancer l’application et la base PostgreSQL
 
-`docker compose up app-prod -d`
+`docker compose up -d`
+
+Cette commande va :
+
+  -Télécharger l’image de l’application depuis GitHub Container Registry (GHCR)
+
+  -Démarrer PostgreSQL avec les bonnes variables d’environnement
+
+  -Exposer l’API sur le port 8080
+
+  -Conserver les données PostgreSQL grâce à un volume Docker persistant
 
 ### 3. Vérifier que tout fonctionne
 
@@ -76,6 +102,51 @@ Vaudoise est une application **Spring Boot** permettant de gérer des **clients*
 ### 5. Arrêter l’application
 
 `docker compose down`
+
+##Mise à jour de l’application
+
+À chaque mise à jour du code (push sur la branche main), une nouvelle image Docker est automatiquement construite et publiée sur le registre GitHub (GHCR).
+
+Pour récupérer et exécuter la dernière version de l’application :
+
+`docker compose pull`
+`docker compose up -d`
+
+Ces commandes :
+
+  -Téléchargent la dernière image disponible sur GHCR
+
+  -Redémarrent automatiquement les services
+
+  -Conservent les données déjà présentes dans PostgreSQL
+
+
+## CI/CD et publication automatique des images
+
+Ce projet utilise GitHub Actions pour automatiser la construction et la publication de l’image Docker.
+
+###Fonctionnement
+
+À chaque push sur la branche main :
+
+  -GitHub Actions exécute un workflow de build.
+
+  -L’image Docker est construite à partir du Dockerfile.
+
+  -L’image est publiée automatiquement sur GitHub Container Registry (GHCR) sous le tag :
+  `ghcr.io/tyilmaz03/vaudoise_app:latest`
+
+Il est ensuite possible de lancer via les commandes: 
+
+  `docker compose pull`
+  `docker compose up -d`
+
+  pour récupérer la nouvelle version sans rien reconstruire localement.
+
+### Emplacement de l’image
+
+Les images générées automatiquement sont disponibles ici :
+  `https://github.com/tyilmaz03?tab=packages`
 
 
 ## Preuve de bon fonctionnement (Proof of Functionality)
