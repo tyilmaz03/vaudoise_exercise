@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.UUID;
 import java.time.LocalDate;
+import org.hibernate.annotations.GenericGenerator;
 
 
 @Getter
@@ -18,7 +19,11 @@ import java.time.LocalDate;
 public abstract class Client implements Serializable {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "uuid-v7")
+    @GenericGenerator(
+        name = "uuid-v7",
+        type = UuidV7Generator.class
+    )
     @Column(nullable = false, updatable = false)
     private UUID id;
 
