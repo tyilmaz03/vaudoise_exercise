@@ -2,13 +2,11 @@
 FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /app
 
-# Copie fine pour optimiser le téléchargement des deps
 COPY pom.xml ./
 COPY .mvn/ .mvn/
-COPY mvnw .
+COPY mvnw ./
 RUN chmod +x mvnw && ./mvnw -B -U -q dependency:go-offline
 
-# Copie des sources et build
 COPY src ./src
 RUN ./mvnw -B -U clean package -DskipTests
 
@@ -20,7 +18,5 @@ COPY --from=builder /app/target/*.jar app.jar
 ENV JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
 ENV SPRING_PROFILES_ACTIVE=prod
 
-# Expose Spring Boot port
 EXPOSE 8080
-
 ENTRYPOINT ["java","-jar","/app/app.jar"]

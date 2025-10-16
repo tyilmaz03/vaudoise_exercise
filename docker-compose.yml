@@ -3,7 +3,7 @@ services:
     image: postgres:16
     container_name: postgres_vaudoise
     restart: unless-stopped
-    env_file: ./.env
+    env_file: .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -19,40 +19,8 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   app:
-    image: maven:3.9-eclipse-temurin-21
-    container_name: vaudoise_app_dev
-    restart: unless-stopped
-    working_dir: /workspace
-    env_file: ./.env
-    environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS}
-      MAVEN_OPTS: ${MAVEN_OPTS}
-    ports:
-      - "8080:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./:/workspace
-      - mvn-repo:/root/.m2
-    command: >
-      bash -lc "
-        chmod +x mvnw || true &&
-        rm -rf target &&
-        ./mvnw -U -B clean verify &&
-        ./mvnw -q spring-boot:run
-      "
-
-  app-prod:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: vaudoise_app:latest
-    container_name: vaudoise_app_prod
+    image: ghcr.io/tyilmaz03/vaudoise_app:latest
+    container_name: vaudoise_app
     restart: unless-stopped
     env_file: .env
     environment:
@@ -65,9 +33,7 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "8081:8080"
-
+      - "8080:8080"
 
 volumes:
   pgdata:
-  mvn-repo:
