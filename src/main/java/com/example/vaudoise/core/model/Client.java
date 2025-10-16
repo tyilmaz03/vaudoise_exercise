@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.UUID;
+import java.time.LocalDate;
+
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,6 +31,9 @@ public abstract class Client implements Serializable {
     @Column(nullable = false, unique = true)
     private String phone;
 
+    @Column
+    private LocalDate deletedAt;
+
     protected Client(String name, String email, String phone) {
         this.name = name;
         this.email = email;
@@ -40,4 +45,10 @@ public abstract class Client implements Serializable {
         this.email = email;
         this.phone = phone;
     }
+
+
+    public void softDelete() {
+        this.deletedAt = LocalDate.now();
+    }
+
 }

@@ -13,16 +13,32 @@ import org.springframework.data.domain.Sort;
 
 
 public interface ContractRepository extends JpaRepository<Contract, UUID> {
-    List<Contract> findByClientId(UUID clientId);
     
-    List<Contract> findByClientIdAndStartDateAfter(UUID clientId, LocalDate date);
-
     @Query("""
         SELECT c FROM Contract c
         WHERE c.client.id = :clientId
-        AND (c.endDate IS NULL OR c.endDate > CURRENT_DATE)
+        AND c.deletedAt IS NULL
     """)
-    List<Contract> findActiveContractsByClientId(UUID clientId, Sort sort);
+    List<Contract> findByClientId(@Param("clientId") UUID clientId);
+    
+    @Query("""
+        SELECT c FROM Contract c
+        WHERE c.client.id = :clientId
+        AND c.startDate > :date
+        AND c.deletedAt IS NULL
+    """)
+    List<Contract> findByClientIdAndStartDateAfter(@Param("clientId") UUID clientId, @Param("date") LocalDate date);
+    
+    
+    @Query("""
+        SELECT c FROM Contract c
+        WHERE c.client.id = :clientId
+        AND c.deletedAt IS NULL
+        AND c.startDate <= CURRENT_DATE
+        AND (c.endDate IS NULL OR c.endDate >= CURRENT_DATE)
+    """)
+    List<Contract> findActiveContractsByClientId(@Param("clientId") UUID clientId, Sort sort);
+
     
 
     @Query("""
@@ -30,15 +46,17 @@ public interface ContractRepository extends JpaRepository<Contract, UUID> {
         WHERE c.client.id = :clientId
         AND c.deletedAt IS NULL
     """)
-    List<Contract> findAllByClientId(UUID clientId, Sort sort);
+    List<Contract> findAllByClientId(@Param("clientId") UUID clientId, Sort sort);
 
     @Query("""
         SELECT COALESCE(SUM(c.amount), 0)
         FROM Contract c
         WHERE c.client.id = :clientId
-        AND (c.endDate IS NULL OR c.endDate > :currentDate)
         AND c.deletedAt IS NULL
+        AND c.startDate <= :currentDate
+        AND (c.endDate IS NULL OR c.endDate >= :currentDate)
     """)
     BigDecimal sumActiveContractsAmount(@Param("clientId") UUID clientId,
-                                    @Param("currentDate") LocalDate currentDate);
+                                        @Param("currentDate") LocalDate currentDate);
+
 }

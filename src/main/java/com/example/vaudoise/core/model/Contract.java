@@ -9,13 +9,15 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
+import java.io.Serializable;
+
 
 @Getter
 @Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "contracts")
-public class Contract {
+public class Contract implements Serializable{
 
     @Id
     @GeneratedValue
@@ -67,6 +69,13 @@ public class Contract {
 
     public void softDelete() {
         this.deletedAt = LocalDate.now();
+    }
+
+    public void softDeleteWithEndDate() {
+        LocalDate now = LocalDate.now();
+        this.deletedAt = now;
+        this.endDate = now;
+        this.updateDate = now;
     }
 
 }
