@@ -24,6 +24,12 @@ public interface ContractRepository extends JpaRepository<Contract, UUID> {
     """)
     List<Contract> findActiveContractsByClientId(UUID clientId, Sort sort);
     
+
+    @Query("""
+        SELECT c FROM Contract c
+        WHERE c.client.id = :clientId
+        AND c.deletedAt IS NULL
+    """)
     List<Contract> findAllByClientId(UUID clientId, Sort sort);
 
     @Query("""
@@ -31,6 +37,7 @@ public interface ContractRepository extends JpaRepository<Contract, UUID> {
         FROM Contract c
         WHERE c.client.id = :clientId
         AND (c.endDate IS NULL OR c.endDate > :currentDate)
+        AND c.deletedAt IS NULL
     """)
     BigDecimal sumActiveContractsAmount(@Param("clientId") UUID clientId,
                                     @Param("currentDate") LocalDate currentDate);

@@ -163,4 +163,17 @@ public class ContractService {
         return mapper.toResponse(updated);
     }
 
+    @Transactional
+    public void deleteContract(UUID id) {
+        Contract contract = contractRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Contract not found with id: " + id));
+
+        if (contract.getDeletedAt() != null) {
+            throw new BadRequestException(List.of("Contract is already deleted"));
+        }
+
+        contract.softDelete();
+        contractRepository.save(contract);
+    }
+
 }

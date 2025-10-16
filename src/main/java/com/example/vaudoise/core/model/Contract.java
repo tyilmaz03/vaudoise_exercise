@@ -38,6 +38,9 @@ public class Contract {
     @Column(nullable = false)
     private LocalDate updateDate;
 
+    @Column
+    private LocalDate deletedAt;
+
     public Contract(Client client, BigDecimal amount, LocalDate startDate, LocalDate endDate) {
         this.client = client;
         this.amount = amount;
@@ -62,5 +65,8 @@ public class Contract {
         this.updateDate = LocalDate.now();
     }
 
+    public void softDelete() {
+        this.deletedAt = LocalDate.now();
+    }
 
 }

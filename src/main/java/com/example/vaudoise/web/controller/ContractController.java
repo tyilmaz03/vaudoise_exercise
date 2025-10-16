@@ -64,5 +64,11 @@ public class ContractController {
         ContractResponse updated = contractService.updateContract(id, request);
         return ResponseEntity.ok(updated);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteContract(@PathVariable UUID id) {
+        contractService.deleteContract(id);
+        return ResponseEntity.noContent().build();
+    }
     
 }
